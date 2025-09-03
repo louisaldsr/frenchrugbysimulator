@@ -1,0 +1,58 @@
+"use client";
+import { TeamRanking } from "@/types/TeamRanking";
+import Image from "next/image";
+
+export interface RankingRowProps {
+  teamRanking: TeamRanking;
+  teamName: string;
+  teamLogoUrl: string;
+  position: number;
+  backgroundColor?: string;
+}
+
+export default function RankingRow(props: RankingRowProps) {
+  const categoryClassName = "px-2 py-2";
+  const { position, teamName, teamLogoUrl, teamRanking } = props;
+  const teamScoreDiff =
+    teamRanking.totalScore.for - teamRanking.totalScore.against;
+  const diffScoreColor =
+    teamScoreDiff > 0
+      ? "text-green-600"
+      : teamScoreDiff < 0
+      ? "text-red-600"
+      : "";
+
+  const rowClass = "text-sm border-gray-100 " + (props.backgroundColor ?? "");
+
+  return (
+    <tr className={rowClass}>
+      <td className={`${categoryClassName} font-bold`}>{position}.</td>
+      <td className={categoryClassName}>
+        <div className="w-8 h-8 sm:w-10 sm:h-8 aspect-square overflow-hidden shrink-0">
+          <Image
+            src={teamLogoUrl}
+            alt={`${teamName} logo`}
+            width={500}
+            height={500}
+            className="w-full h-full object-contain"
+          />
+        </div>
+      </td>
+      <td className={categoryClassName}>{teamName}</td>
+      <td className={categoryClassName}>
+        {teamRanking.totalMatchs.wins +
+          teamRanking.totalMatchs.draws +
+          teamRanking.totalMatchs.losses}
+      </td>
+      <td className={categoryClassName}>{teamRanking.totalMatchs.wins}</td>
+      <td className={categoryClassName}>{teamRanking.totalMatchs.draws}</td>
+      <td className={categoryClassName}>{teamRanking.totalMatchs.losses}</td>
+      <td className={categoryClassName}>{teamRanking.totalScore.for}</td>
+      <td className={categoryClassName}>{teamRanking.totalScore.against}</td>
+      <td className={`${categoryClassName} ${diffScoreColor}`}>
+        {teamRanking.totalScore.for - teamRanking.totalScore.against}
+      </td>
+      <td className={`${categoryClassName} font-bold`}>{teamRanking.points}</td>
+    </tr>
+  );
+}
