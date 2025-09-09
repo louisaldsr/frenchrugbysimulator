@@ -2,6 +2,8 @@
 
 Web Application to run a simulation of a season in the two professional French Rugby league: **TOP14** & **PROD2**.
 
+[[LINK] French Rugby Simulator](https://frenchrugbysimulator.vercel.app/)
+
 ## NextJs
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
