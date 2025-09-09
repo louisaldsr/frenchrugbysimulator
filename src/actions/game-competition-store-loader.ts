@@ -54,6 +54,7 @@ export async function loadGameCompetitionStore(
   rawCalendar.forEach((rawMatch) => {
     const matchData = rawMatch.split(",");
     const rawDay = Number(matchData[0]);
+    if (!rawDay) return;
     const home: MatchSideInitProps = {
       id: sanitizeId(matchData[1]),
       score: Number(matchData[3] ?? 0),
