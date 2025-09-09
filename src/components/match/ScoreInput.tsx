@@ -1,50 +1,56 @@
-import { useScoreUpdate } from '@/context/ScoreContext';
 import {
   ChangeEvent,
   Dispatch,
-  KeyboardEvent,
   SetStateAction,
-  useRef,
-} from 'react';
+  useEffect,
+  useState,
+} from "react";
+
+const INVALID_SCORES = ["1", "2", "4"];
 
 interface ScoreDisplayProps {
-  inputScore: string;
-  setInputScore: Dispatch<SetStateAction<string>>;
+  score: number;
+  setScore: Dispatch<SetStateAction<number>>;
   changeScoreAction: (newScore: number) => void;
-  isSimulatable: boolean;
 }
 
 export default function ScoreDisplay(props: ScoreDisplayProps) {
-  const { inputScore, setInputScore, changeScoreAction } = props;
-  const { notify } = useScoreUpdate();
-  const previousScore = useRef<number | null>(null);
+  const { score, setScore, changeScoreAction } = props;
+  const [draftScore, setDraftScore] = useState<string>(score.toString());
 
-  const parseInput = (input: string): number | null => {
+  useEffect(() => {
+    if (score.toString() !== draftScore) {
+      setDraftScore(score.toString());
+    }
+  }, [score]);
+
+  const isInputValid = (input: string): number | null => {
     const trimmedInput = input.trim();
-    if (trimmedInput === '') return null;
-    if (!/^\d+$/.test(trimmedInput)) return null;
-    if (['1', '2', '4'].includes(trimmedInput)) return null;
-    return Math.min(999, parseInt(trimmedInput, 10));
+    if (trimmedInput === "") return 0;
+    const parsed = Number(trimmedInput);
+    if (isNaN(parsed) || parsed < 0) return null;
+    if (INVALID_SCORES.includes(trimmedInput)) return null;
+    return parsed;
   };
 
-  const commitNewScore = async () => {
-    const parsedInput = parseInput(inputScore) ?? 0;
-    if (parsedInput === previousScore.current) return;
-
-    await changeScoreAction(parsedInput);
-    previousScore.current = parsedInput;
-    notify();
+  const commitNewScore = () => {
+    const validScore = isInputValid(draftScore);
+    if (validScore !== null) {
+      setScore(validScore);
+      changeScoreAction(validScore);
+    } else {
+      setDraftScore(score.toString());
+    }
   };
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const score = parseInput(event.target.value);
-    if (score !== null) setInputScore(score.toString());
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setDraftScore(event.target.value);
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
       commitNewScore();
-      event.currentTarget.blur();
+      event.preventDefault();
     }
   };
 
@@ -52,13 +58,11 @@ export default function ScoreDisplay(props: ScoreDisplayProps) {
     <input
       type="text"
       inputMode="numeric"
-      pattern="\\d*"
-      min={3}
-      value={props.inputScore}
-      onChange={handleChange}
+      pattern="\d*"
+      value={draftScore}
+      onChange={onChange}
       onBlur={commitNewScore}
-      onKeyDown={handleKeyDown}
-      hidden={props.isSimulatable}
+      onKeyDown={onKeyDown}
       className={`w-16 text-center tabular-nums appearance-none focus:outline-none focus:border-none focus:ring-0`}
     />
   );
