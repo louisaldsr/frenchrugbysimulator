@@ -20,13 +20,8 @@ export default function MatchScore(props: MatchScoreProps) {
 
   const { match } = props;
   const matchId = match.id;
-  const isSimulatable = match.homeTeamId === "" || match.awayTeamId === "";
-  const [inputHomeScore, setInputHomeScore] = useState<string>(
-    match.homeTeamScore.toString()
-  );
-  const [inputAwayScore, setInputAwayScore] = useState<string>(
-    match.awayTeamScore.toString()
-  );
+  const [homeScore, setHomeScore] = useState<number>(match.homeTeamScore);
+  const [awayScore, setAwayScore] = useState<number>(match.awayTeamScore);
 
   const [offensiveBonus, setOffensiveBonus] = useState<boolean>(
     match.hasWinnerBonus || false
@@ -36,15 +31,12 @@ export default function MatchScore(props: MatchScoreProps) {
     notify();
   }, [offensiveBonus]);
 
-  const getWinner = (): MatchSide | null => {
-    if (inputHomeScore > inputAwayScore) return "home";
-    if (inputHomeScore < inputAwayScore) return "away";
-    return null;
-  };
   const [winner, setWinner] = useState<MatchSide | null>(null);
   useEffect(() => {
-    setWinner(getWinner);
-  }, [inputHomeScore, inputAwayScore]);
+    if (homeScore > awayScore) setWinner("home");
+    else if (homeScore < awayScore) setWinner("away");
+    else setWinner(null);
+  }, [homeScore, awayScore]);
 
   return (
     <div className="relative flex items-center justify-center">
@@ -60,21 +52,21 @@ export default function MatchScore(props: MatchScoreProps) {
 
       <div className="flex items-center justify-center min-w-[120px] tabular-nums font-semibold">
         <ScoreDisplay
-          inputScore={inputHomeScore}
-          setInputScore={setInputHomeScore}
-          changeScoreAction={(newScore: number) =>
-            changeMatchScore({ matchId, homeScore: newScore, awayScore: null })
-          }
-          isSimulatable={isSimulatable}
+          score={homeScore}
+          setScore={setHomeScore}
+          changeScoreAction={(newScore: number) => {
+            changeMatchScore({ matchId, homeScore: newScore, awayScore: null });
+            notify();
+          }}
         />
         <div className="text-center font-bold">-</div>
         <ScoreDisplay
-          inputScore={inputAwayScore}
-          setInputScore={setInputAwayScore}
-          changeScoreAction={(newScore: number) =>
-            changeMatchScore({ matchId, homeScore: null, awayScore: newScore })
-          }
-          isSimulatable={isSimulatable}
+          score={awayScore}
+          setScore={setAwayScore}
+          changeScoreAction={(newScore: number) => {
+            changeMatchScore({ matchId, homeScore: null, awayScore: newScore });
+            notify();
+          }}
         />
       </div>
 
