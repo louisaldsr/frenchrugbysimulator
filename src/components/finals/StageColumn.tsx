@@ -13,15 +13,17 @@ export default function StageColumn(props: StageColumnProps) {
         {props.stage}
       </h3>
       <div className="flex flex-col gap-4">
-        {Array.from(Object.entries(props.finals)).map(([finalKey, match]) => {
-          return (
-            <FinalsMatchBox
-              key={match.id}
-              finalKey={finalKey as FinalsKeys}
-              match={match}
-            />
-          );
-        })}
+        {Array.from(Object.entries(props.finals)).map(
+          ([finalKey, final], index) => {
+            return (
+              <FinalsMatchBox
+                key={`${props.stage}${index}`}
+                finalKey={finalKey as FinalsKeys}
+                final={final}
+              />
+            );
+          }
+        )}
       </div>
     </div>
   );

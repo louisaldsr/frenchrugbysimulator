@@ -1,7 +1,6 @@
 "use client";
 
 import { useGameStore } from "@/context/GameStore";
-import { useScoreUpdate } from "@/context/ScoreContext";
 import { Match, MatchSide } from "@/types/Match";
 import { useEffect, useState } from "react";
 import ScoreDisplay from "./ScoreInput";
@@ -12,11 +11,7 @@ export interface MatchScoreProps {
 }
 
 export default function MatchScore(props: MatchScoreProps) {
-  const { notify } = useScoreUpdate();
-  const changeMatchScore = useGameStore((store) => store.updateMatchScore);
-  const changeOffensiveBonus = useGameStore(
-    (store) => store.updateOffensiveBonus
-  );
+  const updateMatch = useGameStore((store) => store.updateMatch);
 
   const { match } = props;
   const matchId = match.id;
@@ -27,9 +22,11 @@ export default function MatchScore(props: MatchScoreProps) {
     match.hasWinnerBonus || false
   );
   useEffect(() => {
-    changeOffensiveBonus(matchId, offensiveBonus);
-    notify();
-  }, [offensiveBonus]);
+    updateMatch({
+      matchId,
+      offensiveBonus,
+    });
+  }, [offensiveBonus, matchId, updateMatch]);
 
   const [winner, setWinner] = useState<MatchSide | null>(null);
   useEffect(() => {
@@ -54,19 +51,17 @@ export default function MatchScore(props: MatchScoreProps) {
         <ScoreDisplay
           score={homeScore}
           setScore={setHomeScore}
-          changeScoreAction={(newScore: number) => {
-            changeMatchScore({ matchId, homeScore: newScore, awayScore: null });
-            notify();
-          }}
+          changeScoreAction={(newScore: number) =>
+            updateMatch({ matchId, homeScore: newScore })
+          }
         />
         <div className="text-center font-bold">-</div>
         <ScoreDisplay
           score={awayScore}
           setScore={setAwayScore}
-          changeScoreAction={(newScore: number) => {
-            changeMatchScore({ matchId, homeScore: null, awayScore: newScore });
-            notify();
-          }}
+          changeScoreAction={(newScore: number) =>
+            updateMatch({ matchId, awayScore: newScore })
+          }
         />
       </div>
 

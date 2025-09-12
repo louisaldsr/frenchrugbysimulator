@@ -5,25 +5,13 @@ import {
   RANKING_RELEGATION_POSITIONS,
 } from "@/constants";
 import { useGameStore } from "@/context/GameStore";
-import { useScoreUpdate } from "@/context/ScoreContext";
-import { TeamRanking } from "@/types/TeamRanking";
-import { useEffect, useState } from "react";
 import RankingHeader from "./RankingHeader";
 import RankingRow from "./RankingRow";
 
 export default function RankingTable() {
-  const { updated } = useScoreUpdate();
   const { getTeam, getRanking } = useGameStore();
-  const [ranking, setRanking] = useState<TeamRanking[]>([]);
+  const ranking = getRanking();
   const numberOfTeams = ranking.length;
-
-  useEffect(() => {
-    const updateRanking = async () => {
-      const newRanking = getRanking();
-      setRanking(newRanking);
-    };
-    updateRanking();
-  }, [updated]);
 
   const getBackgroundColor = (position: number): string | undefined => {
     if (RANKING_QUALIFICATION_POSITIONS.SEMI_FINALS.includes(position)) {

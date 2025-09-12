@@ -1,15 +1,15 @@
 "use client";
 import { useGameStore } from "@/context/GameStore";
 import { FinalsKeys } from "@/types/Finals";
-import { Match, MatchSide } from "@/types/Match";
 import { Team } from "@/types/Team";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
 interface TeamButtonProps {
   finalKey: FinalsKeys;
-  side: MatchSide;
-  match: Match;
+  teamId: string | null;
+  winner: string | null;
+  disabled?: boolean;
 }
 
 const TBD_TEAM: Team = {
@@ -22,14 +22,10 @@ const TBD_TEAM: Team = {
 const HOLD_MS = 2000;
 
 export default function TeamButton(props: TeamButtonProps) {
-  const { finalKey, match, side } = props;
-  const teamId = side === "home" ? match.homeTeamId : match.awayTeamId;
-  const opponentId = side === "home" ? match.awayTeamId : match.homeTeamId;
+  const { finalKey, teamId, winner, disabled } = props;
 
   const getTeam = useGameStore((store) => store.getTeam);
-  const qualifyTeamForNextFinal = useGameStore(
-    (store) => store.qualifyTeamForNextFinal
-  );
+  const qualifyTeam = useGameStore((store) => store.qualifyTeam);
 
   let team: Team = TBD_TEAM;
   if (teamId) {
@@ -41,24 +37,18 @@ export default function TeamButton(props: TeamButtonProps) {
   let resultMatchStyle = "";
   const winnerStyle = "bg-green-400";
   const looserStyle = "bg-red-400";
-  if (match.homeTeamScore !== match.awayTeamScore) {
-    if (match.homeTeamScore > match.awayTeamScore) {
-      if (side === "home") resultMatchStyle = winnerStyle;
-      if (side === "away") resultMatchStyle = looserStyle;
-    } else {
-      if (side === "home") resultMatchStyle = looserStyle;
-      if (side === "away") resultMatchStyle = winnerStyle;
-    }
+  if (winner && teamId === winner) {
+    resultMatchStyle = winnerStyle;
+  } else if (winner && teamId !== winner) {
+    resultMatchStyle = looserStyle;
   }
-
-  const disabled = !Boolean(team.id && opponentId && resultMatchStyle === "");
 
   const [isPressing, setIsPressing] = useState(false);
   const holdTimeoutRef = useRef<number>(null);
 
   const triggerAction = () => {
-    if (team.id) {
-      qualifyTeamForNextFinal(team.id, finalKey);
+    if (teamId) {
+      qualifyTeam(teamId, finalKey);
     }
   };
 
@@ -132,7 +122,7 @@ export default function TeamButton(props: TeamButtonProps) {
         </div>
         {!disabled && (
           <div className="relative z-10 text-[10px] text-gray-600">
-            Hold 3s to qualify
+            Hold 2s to qualify
           </div>
         )}
       </div>
