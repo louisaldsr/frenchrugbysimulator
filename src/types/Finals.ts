@@ -1,4 +1,4 @@
-import { Match } from "./Match";
+import { TeamId } from "./Team";
 
 export enum FinalsKeys {
   PlayOff1 = "playoff 1",
@@ -6,7 +6,12 @@ export enum FinalsKeys {
   SemiFinal1 = "semi final 1",
   SemiFinal2 = "semi final 2",
   Final = "final",
-  Champion = "champion",
 }
 
-export type Finals = Record<FinalsKeys, Match>;
+export interface Final {
+  home: TeamId | null;
+  away: TeamId | null;
+  winner: TeamId | null;
+}
+
+export type Finals = Record<FinalsKeys, Final>;

@@ -1,39 +1,46 @@
 "use client";
 
-import { CompetitionStore, useGameStore } from "@/context/GameStore";
+import { useGameStore } from "@/context/GameStore";
+import { Calendar } from "@/types/Calendar";
 import { Competition } from "@/types/Competition";
+import { Team } from "@/types/Team";
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   children: React.ReactNode;
   competition: Competition;
-  store: CompetitionStore;
+  teams: Team[];
+  calendars: Record<Competition, Calendar>;
 }
 
 export default function CompetitionStoreLoader(props: Props) {
-  const { competition, store } = props;
+  const { competition, teams, calendars } = props;
+
+  const [initalized, setInitalized] = useState<boolean>(false);
 
   const setCompetition = useGameStore((store) => store.setCompetition);
-  const initializeCompetition = useGameStore(
-    (store) => store.initializeCompetition
-  );
-  const competitionStore = useGameStore(
-    (store) => store.competitionStores[competition]
-  );
+  const setTeams = useGameStore((store) => store.setTeams);
+  const setCalendars = useGameStore((store) => store.setCalendars);
+  const refreshFinals = useGameStore((store) => store.refreshFinals);
 
   useEffect(() => {
     setCompetition(competition);
-    if (!competitionStore) initializeCompetition(competition, store);
+    setTeams(teams);
+    setCalendars(calendars);
+    refreshFinals();
+    setInitalized(true);
   }, [
     competition,
-    competitionStore,
-    store,
+    teams,
+    calendars,
+    refreshFinals,
+    setCalendars,
     setCompetition,
-    initializeCompetition,
+    setTeams,
   ]);
 
-  if (!competitionStore)
+  if (!initalized && teams.length > 0 && Object.keys(calendars).length > 0) {
     return (
       <div
         className="grid place-items-center py-16"
@@ -70,6 +77,7 @@ export default function CompetitionStoreLoader(props: Props) {
         </div>
       </div>
     );
+  }
 
   return <>{props.children}</>;
 }

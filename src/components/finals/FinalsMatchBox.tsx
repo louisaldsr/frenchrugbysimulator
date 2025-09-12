@@ -1,14 +1,15 @@
-import { FinalsKeys } from "@/types/Finals";
-import { Match } from "@/types/Match";
+import { Final, FinalsKeys } from "@/types/Finals";
 import TeamButton from "./TeamButton";
 
 interface FinalsMatchBoxProps {
   finalKey: FinalsKeys;
-  match: Match;
+  final: Final;
 }
 
 export default function FinalsMatchBox(props: FinalsMatchBoxProps) {
-  const { finalKey, match } = props;
+  const { finalKey, final } = props;
+  const { home, away, winner } = final;
+  const disabled = Boolean(!home || !away || winner);
 
   return (
     <div className="p-[1px] rounded-3xl">
@@ -16,14 +17,16 @@ export default function FinalsMatchBox(props: FinalsMatchBoxProps) {
         <TeamButton
           key={`${finalKey}Home`}
           finalKey={finalKey}
-          side={"home"}
-          match={match}
+          teamId={home}
+          winner={winner}
+          disabled={disabled}
         />
         <TeamButton
           key={`${finalKey}Away`}
           finalKey={finalKey}
-          side={"away"}
-          match={match}
+          teamId={away}
+          winner={winner}
+          disabled={disabled}
         />
       </div>
     </div>

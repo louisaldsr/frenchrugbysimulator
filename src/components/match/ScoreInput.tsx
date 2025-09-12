@@ -22,7 +22,7 @@ export default function ScoreDisplay(props: ScoreDisplayProps) {
     if (score.toString() !== draftScore) {
       setDraftScore(score.toString());
     }
-  }, [score]);
+  }, [score, draftScore]);
 
   const isInputValid = (input: string): number | null => {
     const trimmedInput = input.trim();

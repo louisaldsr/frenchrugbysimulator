@@ -2,211 +2,180 @@
 
 import { MatchNotFoundError } from "@/errors/MatchNotFound.error";
 import { TeamNotFoundError } from "@/errors/TeamNotFound.error";
-import { computeFinals } from "@/helpers/compute-finals";
-import { getNextFinalsFlow } from "@/helpers/get-next-final";
+import refreshCalendar from "@/helpers/calendar/refresh-calendar";
+import { computeFinals } from "@/helpers/finals/compute-finals";
 import { computeRanking } from "@/helpers/ranking/ranking-computer";
 import { Calendar } from "@/types/Calendar";
 import { Competition } from "@/types/Competition";
 import { Finals, FinalsKeys } from "@/types/Finals";
-import { Team } from "@/types/Team";
+import { Match } from "@/types/Match";
+import { Team, TeamId } from "@/types/Team";
 import { TeamRanking } from "@/types/TeamRanking";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export interface UpdateMatchScoreParams {
+export interface UpdateMatchParams {
   matchId: string;
-  homeScore: number | null;
-  awayScore: number | null;
-}
-
-export interface CompetitionStore {
-  championId: string;
-  calendar: Calendar;
-  finals: Finals;
-  teams: Team[];
+  homeScore?: number;
+  awayScore?: number;
+  offensiveBonus?: boolean;
 }
 
 export interface GameStore {
   competition: Competition;
-  competitionStores: Record<Competition, CompetitionStore | null>;
+  calendars: Record<Competition, Calendar | null>;
+  teams: Team[];
+  finals: Finals;
+  championId: TeamId | null;
+
+  /* TEAMS */
+  setTeams: (teams: Team[]) => void;
+  getTeam: (id: TeamId) => Team;
+
+  /* COMPETITION */
   setCompetition: (competition: Competition) => void;
-  initializeCompetition: (
-    competition: Competition,
-    store: CompetitionStore
-  ) => void;
-  getCompetitionStore: () => CompetitionStore;
-  updateCompetitionStore: (
-    updater: (store: CompetitionStore) => CompetitionStore
-  ) => void;
-  updateMatchScore: (params: UpdateMatchScoreParams) => void;
-  updateOffensiveBonus: (matchId: string, bonus: boolean) => void;
+
+  /* CALENDAR */
   getCalendar: () => Calendar;
-  getFinals: () => Finals;
-  getTeams: () => Team[];
-  getTeam: (id: string) => Team;
-  getChampion: () => string;
+  setCalendars: (calendars: Record<Competition, Calendar>) => void;
+
+  /* RANKING */
   getRanking: () => TeamRanking[];
-  refreshFinals: () => void;
-  qualifyTeamForNextFinal: (teamId: string, finalKey: FinalsKeys) => void;
-  resetChampion: () => void;
+
+  /* MATCH */
+  getMatch(matchId: string): Match;
+  setMatch(match: Match): void;
+  updateMatch(params: UpdateMatchParams): void;
+
+  /* FINALS */
+  refreshFinals(): void;
+  setChampion(championId: TeamId | null): void;
+  qualifyTeam(teamId: TeamId, finalKey: FinalsKeys): void;
 }
 
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       competition: "top14",
-      competitionStores: {
+      calendars: {
         prod2: null,
         top14: null,
       },
-      initialized: false,
+      teams: [],
+      finals: {} as Finals,
+      championId: null,
 
-      setCompetition: (competition: Competition) => {
-        set({
-          competition,
-        });
-      },
-
-      initializeCompetition: (
-        competition: Competition,
-        store: CompetitionStore
-      ) => {
-        const existingStores = get().competitionStores;
-        if (existingStores[competition]) return;
-        set({
-          competitionStores: {
-            ...existingStores,
-            [competition]: store,
-          },
-        });
-      },
-
-      getCompetitionStore: (): CompetitionStore => {
-        const competition = get().competition;
-        const store = get().competitionStores[competition];
-        if (store === null)
-          throw new Error(
-            `Store of competition not initialized [competition: ${competition}]`
-          );
-        return store;
-      },
-
-      updateCompetitionStore: (
-        updater: (store: CompetitionStore) => CompetitionStore
-      ): void => {
-        set((store) => {
-          const competition = store.competition;
-          const currentStore = store.getCompetitionStore();
-          return {
-            competitionStores: {
-              ...store.competitionStores,
-              [competition]: updater(currentStore!),
-            },
-          };
-        });
-      },
-
-      getCalendar: (): Calendar => {
-        return get().getCompetitionStore().calendar;
-      },
-
-      getFinals: (): Finals => {
-        return get().getCompetitionStore().finals;
-      },
-
-      getTeams: (): Team[] => {
-        return get().getCompetitionStore().teams;
-      },
-
-      getChampion: (): string => {
-        return get().getCompetitionStore().championId;
-      },
-
-      updateMatchScore: (params: UpdateMatchScoreParams) => {
-        const calendar = get().getCalendar();
-        const match = calendar
-          .flat()
-          .find((match) => match.id === params.matchId);
-
-        if (!match) throw new MatchNotFoundError({ id: params.matchId });
-        if (params.homeScore) match.homeTeamScore = params.homeScore;
-        if (params.awayScore) match.awayTeamScore = params.awayScore;
-        match.simulated = true;
-      },
-
-      updateOffensiveBonus: (matchId: string, bonus: boolean) => {
-        set((store) => {
-          const calendar = store.getCalendar();
-          const match = calendar.flat().find((match) => match.id === matchId);
-          if (!match) return store;
-          match.hasWinnerBonus = bonus;
-          return store;
-        });
-      },
-
-      getTeam(teamId: string): Team {
-        const team = get()
-          .getTeams()
-          .find((team) => team.id === teamId);
-        if (!team) throw new TeamNotFoundError({ id: teamId });
+      /* TEAMS */
+      setTeams: (teams) => set({ teams }),
+      getTeam: (id) => {
+        const team = get().teams.find((team) => team.id === id);
+        if (!team) throw new TeamNotFoundError({ id });
         return team;
       },
 
-      getRanking(): TeamRanking[] {
+      /* COMPETITION */
+      setCompetition: (competition) => set({ competition }),
+
+      /* CALENDAR */
+      getCalendar: () => {
+        const { competition, calendars } = get();
+        if (!calendars[competition]) throw new Error("Calendar not found");
+        return calendars[competition];
+      },
+      setCalendars: (freshCalendars) => {
+        const refreshedCalendars = {
+          prod2: freshCalendars.prod2,
+          top14: freshCalendars.top14,
+        };
+        const inMemoryCalendars = get().calendars;
+        if (inMemoryCalendars.prod2) {
+          refreshedCalendars.prod2 = refreshCalendar(
+            freshCalendars.prod2,
+            inMemoryCalendars.prod2
+          );
+        }
+        if (inMemoryCalendars.top14) {
+          refreshedCalendars.top14 = refreshCalendar(
+            freshCalendars.top14,
+            inMemoryCalendars.top14
+          );
+        }
+
+        set({ calendars: refreshedCalendars });
+      },
+
+      /* RANKING */
+      getRanking() {
         const calendar = get().getCalendar();
-        const teams = get().getTeams();
+        const teams = get().teams;
         return computeRanking(calendar, teams);
       },
 
-      refreshFinals(): void {
+      /* MATCH */
+      getMatch(id) {
+        const calendar = get().getCalendar();
+        const match = calendar.flat().find((match) => match.id === id);
+        if (!match) throw new MatchNotFoundError({ id });
+        return match;
+      },
+      setMatch(match) {
+        get().getMatch(match.id);
+        const calendar = get().getCalendar();
+        const updatedCalendar = calendar.map((day) =>
+          day.map((calendarMatch) =>
+            calendarMatch.id === match.id
+              ? { ...calendarMatch, ...match }
+              : calendarMatch
+          )
+        );
+
+        set({
+          calendars: {
+            ...get().calendars,
+            [get().competition]: updatedCalendar,
+          },
+        });
+      },
+      updateMatch(params) {
+        const match = get().getMatch(params.matchId);
+        if (params.homeScore !== undefined)
+          match.homeTeamScore = params.homeScore;
+        if (params.awayScore !== undefined)
+          match.awayTeamScore = params.awayScore;
+        if (params.offensiveBonus !== undefined)
+          match.hasWinnerBonus = params.offensiveBonus;
+        if (match.homeTeamScore || match.awayTeamScore) match.simulated = true;
+        get().setMatch(match);
+      },
+
+      /* FINALS */
+      refreshFinals() {
         const ranking = get().getRanking();
-        const newFinals = computeFinals(ranking);
-        get().updateCompetitionStore((store) => ({
-          ...store,
-          finals: newFinals,
-        }));
+        const finals = computeFinals(ranking);
+        set({ finals });
       },
-
-      qualifyTeamForNextFinal(teamId: string, finalKey: FinalsKeys): void {
-        const existingFinals = get().getFinals();
-        let championId = "";
-
-        /* Represent winner with symbol score */
-        const playedFinal = existingFinals[finalKey];
-        if (playedFinal.homeTeamId === teamId) {
-          playedFinal.homeTeamScore = 1;
-          playedFinal.awayTeamScore = 0;
-        } else {
-          playedFinal.awayTeamScore = 1;
-          playedFinal.homeTeamScore = 0;
+      setChampion: (championId) => set({ championId }),
+      qualifyTeam(teamId, finalKey) {
+        const finals = Object.assign({}, get().finals);
+        finals[finalKey].winner = teamId;
+        switch (finalKey) {
+          case FinalsKeys.PlayOff1:
+            finals[FinalsKeys.SemiFinal1].away = teamId;
+            break;
+          case FinalsKeys.PlayOff2:
+            finals[FinalsKeys.SemiFinal2].away = teamId;
+            break;
+          case FinalsKeys.SemiFinal1:
+            finals[FinalsKeys.Final].home = teamId;
+            break;
+          case FinalsKeys.SemiFinal2:
+            finals[FinalsKeys.Final].away = teamId;
+            break;
+          case FinalsKeys.Final:
+            get().setChampion(teamId);
+            break;
         }
-
-        /* Send winner to next final */
-        const nextFinalFlow = getNextFinalsFlow(finalKey);
-        if (nextFinalFlow.next === FinalsKeys.Champion) {
-          championId = teamId;
-        }
-        const nextFinal = existingFinals[nextFinalFlow.next];
-        if (nextFinalFlow.side === "home") {
-          nextFinal.homeTeamId = teamId;
-        } else {
-          nextFinal.awayTeamId = teamId;
-        }
-
-        const updatedFinals: Finals = {
-          ...existingFinals,
-          [finalKey]: playedFinal,
-          [nextFinalFlow.next]: nextFinal,
-        };
-        get().updateCompetitionStore((store) => ({
-          ...store,
-          championId,
-          finals: updatedFinals,
-        }));
-      },
-
-      resetChampion(): void {
-        get().updateCompetitionStore((store) => ({ ...store, championId: "" }));
+        set({ finals });
       },
     }),
     {

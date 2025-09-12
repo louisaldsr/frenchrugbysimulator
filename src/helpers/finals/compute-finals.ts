@@ -1,8 +1,6 @@
 import { RANKING_QUALIFICATION_POSITIONS } from "@/constants";
-import { Finals, FinalsKeys } from "@/types/Finals";
-import { Match } from "@/types/Match";
+import { Final, Finals, FinalsKeys } from "@/types/Finals";
 import { TeamRanking } from "@/types/TeamRanking";
-import { v4 } from "uuid";
 
 export function computeFinals(ranking: TeamRanking[]): Finals {
   const playOffTeams = RANKING_QUALIFICATION_POSITIONS.PLAY_OFFS.map(
@@ -15,21 +13,16 @@ export function computeFinals(ranking: TeamRanking[]): Finals {
   return {
     [FinalsKeys.PlayOff1]: createFinal(playOffTeams[0], playOffTeams[3]),
     [FinalsKeys.PlayOff2]: createFinal(playOffTeams[1], playOffTeams[2]),
-    [FinalsKeys.SemiFinal1]: createFinal(semiFinalsTeams[0], ""),
-    [FinalsKeys.SemiFinal2]: createFinal(semiFinalsTeams[1], ""),
-    [FinalsKeys.Final]: createFinal("", ""),
-    [FinalsKeys.Champion]: createFinal("", ""),
+    [FinalsKeys.SemiFinal1]: createFinal(semiFinalsTeams[0], null),
+    [FinalsKeys.SemiFinal2]: createFinal(semiFinalsTeams[1], null),
+    [FinalsKeys.Final]: createFinal(null, null),
   };
 }
 
-function createFinal(homeTeamId: string, awayTeamId: string): Match {
+function createFinal(home: string | null, away: string | null): Final {
   return {
-    id: v4(),
-    dayNumber: 0,
-    homeTeamId,
-    homeTeamScore: 0,
-    awayTeamId,
-    awayTeamScore: 0,
-    simulated: false
+    home,
+    away,
+    winner: null,
   };
 }

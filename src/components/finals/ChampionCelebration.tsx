@@ -18,11 +18,11 @@ const loadConfetti = async () => (await import("canvas-confetti")).default;
 
 export default function ChampionCelebration(props: Props) {
   const champion = useGameStore((store) => store.getTeam(props.championId));
-  const resetChampion = useGameStore((store) => store.resetChampion);
   const competition = useGameStore((store) => store.competition);
+  const setChampion = useGameStore((store) => store.setChampion);
 
   const onClose = () => {
-    resetChampion();
+    setChampion(null);
   };
 
   useEffect(() => {
