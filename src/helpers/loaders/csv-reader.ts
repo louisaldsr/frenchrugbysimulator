@@ -1,9 +1,8 @@
-import { Competition } from "@/types/Competition";
 import { promises as fs } from "fs";
 import path from "path";
 
 export default async function readCsv(
-  competition: Competition,
+  competition: string,
   fileName: string
 ): Promise<string[]> {
   const csvPath = path.join(
