@@ -1,6 +1,5 @@
 {
   "functions": {
-    "app/**/route.{js,ts}": { "includeFiles": "public/data/**" },
-    "app/**/page.{js,ts,tsx}": { "includeFiles": "public/data/**" }
+    "app/**": { "includeFiles": "public/data/**" }
   }
 }
