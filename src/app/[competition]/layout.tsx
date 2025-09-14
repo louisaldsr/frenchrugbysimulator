@@ -5,6 +5,8 @@ import CompetitionStoreLoader from "@/components/competitions/CompetitionStoreLo
 import Title from "@/components/Title";
 import { notFound } from "next/navigation";
 
+export const runtime = "nodejs";
+
 export default async function CompetitionLayout({
   children,
   params,
