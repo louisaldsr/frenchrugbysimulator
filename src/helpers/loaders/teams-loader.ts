@@ -5,8 +5,8 @@ import readCsv from "./csv-reader";
 export default async function loadTeams(): Promise<Team[]> {
   const rawTeams = (
     await Promise.all([
-      readCsv("top14", "teams.csv"),
       readCsv("prod2", "teams.csv"),
+      readCsv("top14", "teams.csv"),
     ])
   ).flat();
 
