@@ -5,8 +5,6 @@ import CompetitionStoreLoader from "@/components/competitions/CompetitionStoreLo
 import Title from "@/components/Title";
 import { notFound } from "next/navigation";
 
-export const runtime = "nodejs";
-
 export default async function CompetitionLayout({
   children,
   params,
@@ -23,23 +21,23 @@ export default async function CompetitionLayout({
   const store = await loadGameStore();
 
   return (
-    <CompetitionStoreLoader
-      competition={competition}
-      calendars={store.calendars}
-      teams={store.teams}
-    >
-      <div className="min-h-screen bg-gray-100 text-gray-900 px-4 py-8">
-        <div className="max-w-7xl mx-auto flex flex-col gap-10">
-          <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
-            <BackCompetitionButton />
-            <Title />
-          </header>
-          <main>
+    <div className="min-h-screen bg-gray-100 text-gray-900 px-4 py-8">
+      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+        <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+          <BackCompetitionButton />
+          <Title />
+        </header>
+        <main>
+          <CompetitionStoreLoader
+            competition={competition}
+            calendars={store.calendars}
+            teams={store.teams}
+          >
             <FinalsRefreshEffect />
             {children}
-          </main>
-        </div>
+          </CompetitionStoreLoader>
+        </main>
       </div>
-    </CompetitionStoreLoader>
+    </div>
   );
 }

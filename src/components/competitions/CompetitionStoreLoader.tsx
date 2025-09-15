@@ -40,7 +40,11 @@ export default function CompetitionStoreLoader(props: Props) {
     setTeams,
   ]);
 
-  if (!initalized && teams.length > 0 && Object.keys(calendars).length > 0) {
+  if (
+    !initalized ||
+    teams.length === 0 ||
+    Object.keys(calendars).length === 0
+  ) {
     return (
       <div
         className="grid place-items-center py-16"

@@ -1,18 +1,17 @@
 import { Competition } from "@/types/Competition";
-import { promises as fs } from "fs";
-import path from "path";
 
 export default async function readCsv(
   competition: Competition,
   fileName: string
 ): Promise<string[]> {
-  const csvPath = path.join(
-    process.cwd(),
-    "public",
-    "data",
-    competition,
-    fileName
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_URL || ""}/data/${competition}/${fileName}`
   );
-  const rawFileContent = await fs.readFile(csvPath, "utf-8");
-  return rawFileContent.split("\n");
+
+  if (!response.ok) {
+    throw new Error(`Failed to load ${fileName} for ${competition}`);
+  }
+
+  const text = await response.text();
+  return text.split("\n");
 }

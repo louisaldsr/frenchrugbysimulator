@@ -1,5 +1,4 @@
 "use server";
-import "server-only";
 
 import loadCalendar from "@/helpers/loaders/calendars-loader";
 import loadTeams from "@/helpers/loaders/teams-loader";
