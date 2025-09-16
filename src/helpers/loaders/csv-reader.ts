@@ -8,8 +8,6 @@ export default async function readCsv(
     process.env.NEXT_PUBLIC_URL || ""
   }/data/${competition}/${fileName}`;
   try {
-    console.log(`Fetching from: ${url}`);
-
     const response = await fetch(url, {
       headers: {
         Accept: "text/csv, text/plain, */*",
@@ -26,8 +24,6 @@ export default async function readCsv(
       });
 
       const text = await response.text();
-      console.error("Response body:", text);
-
       throw new Error(
         `Failed to load ${fileName} for ${competition}. Status: ${response.status}`
       );
@@ -38,8 +34,6 @@ export default async function readCsv(
     if (!text || text.trim().length === 0) {
       throw new Error(`Empty response received for ${fileName}`);
     }
-
-    console.log(`Successfully loaded ${fileName} (${text.length} bytes)`);
 
     return text.split("\n").filter((line) => line.trim().length > 0);
   } catch (error) {
