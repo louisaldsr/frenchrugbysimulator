@@ -1,7 +1,6 @@
 import { Calendar } from "@/types/Calendar";
 import { Competition } from "@/types/Competition";
 import { Match } from "@/types/Match";
-import { v4 } from "uuid";
 import { sanitizeId } from "../sanitizers";
 import readCsv from "./csv-reader";
 
@@ -48,7 +47,7 @@ function createMatch(
 ): Match {
   const simulated = Boolean(home.score || away.score);
   return {
-    id: v4(),
+    id: `${dayNumber}-${home.id}-${away.id}`,
     dayNumber,
     homeTeamId: home.id,
     homeTeamScore: home.score,

@@ -28,6 +28,9 @@ export interface GameStore {
   finals: Finals;
   championId: TeamId | null;
 
+  isInitialized: boolean;
+  setInitialized: (value: boolean) => void;
+
   /* TEAMS */
   setTeams: (teams: Team[]) => void;
   getTeam: (id: TeamId) => Team;
@@ -65,6 +68,9 @@ export const useGameStore = create<GameStore>()(
       finals: {} as Finals,
       championId: null,
 
+      isInitialized: false,
+      setInitialized: (value: boolean) => set({ isInitialized: value }),
+
       /* TEAMS */
       setTeams: (teams) => set({ teams }),
       getTeam: (id) => {
@@ -101,7 +107,7 @@ export const useGameStore = create<GameStore>()(
           );
         }
 
-        set({ calendars: refreshedCalendars });
+        set({ calendars: refreshedCalendars, isInitialized: true });
       },
 
       /* RANKING */
@@ -180,6 +186,7 @@ export const useGameStore = create<GameStore>()(
     }),
     {
       name: "gameStore",
+      version: 1,
     }
   )
 );
