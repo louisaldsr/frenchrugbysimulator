@@ -18,6 +18,11 @@ export default function MatchScore(props: MatchScoreProps) {
   const [homeScore, setHomeScore] = useState<number>(match.homeTeamScore);
   const [awayScore, setAwayScore] = useState<number>(match.awayTeamScore);
 
+  useEffect(() => {
+    if (homeScore !== match.homeTeamScore) setHomeScore(match.homeTeamScore);
+    if (awayScore !== match.awayTeamScore) setAwayScore(match.awayTeamScore);
+  }, [match.homeTeamScore, match.awayTeamScore]);
+
   const [offensiveBonus, setOffensiveBonus] = useState<boolean>(
     match.hasWinnerBonus || false
   );

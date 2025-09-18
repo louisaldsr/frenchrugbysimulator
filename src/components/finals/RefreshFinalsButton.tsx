@@ -1,6 +1,7 @@
 "use client";
 import { useGameStore } from "@/context/GameStore";
 import { useState } from "react";
+import RefreshIcon from "../global/RefreshIcon";
 
 interface Props {
   className?: string;
@@ -30,22 +31,7 @@ export default function RefreshFinalsButton(props: Props) {
                   hover:bg-slate-900/80 focus:outline-none focus-visible:ring-2
                   focus-visible:ring-violet-400/60 active:scale-95 transition ${props.className}`}
     >
-      <svg
-        viewBox="0 0 24 24"
-        className={`h-4 w-4 transition-transform ${
-          busy ? "animate-spin" : "group-hover:rotate-180"
-        }`}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 3v6h-6" />
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M21 12a9 9 0 1 1-9-9"
-        />
-      </svg>
+      <RefreshIcon busy={busy} />
       <span className="hidden sm:inline">Recompute</span>
     </button>
   );

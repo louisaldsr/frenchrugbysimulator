@@ -23,7 +23,7 @@ export interface UpdateMatchParams {
 
 export interface GameStore {
   competition: Competition;
-  calendars: Record<Competition, Calendar | null>;
+  calendars: Record<Competition, Calendar>;
   teams: Team[];
   finals: Finals;
   championId: TeamId | null;
@@ -40,7 +40,10 @@ export interface GameStore {
 
   /* CALENDAR */
   getCalendar: () => Calendar;
-  setCalendars: (calendars: Record<Competition, Calendar>) => void;
+  setCalendars: (
+    calendars: Record<Competition, Calendar>,
+    forceFreshCalendars?: boolean
+  ) => void;
 
   /* RANKING */
   getRanking: () => TeamRanking[];
@@ -61,8 +64,8 @@ export const useGameStore = create<GameStore>()(
     (set, get) => ({
       competition: "top14",
       calendars: {
-        prod2: null,
-        top14: null,
+        prod2: [],
+        top14: [],
       },
       teams: [],
       finals: {} as Finals,
@@ -88,7 +91,12 @@ export const useGameStore = create<GameStore>()(
         if (!calendars[competition]) throw new Error("Calendar not found");
         return calendars[competition];
       },
-      setCalendars: (freshCalendars) => {
+      setCalendars: (freshCalendars, forceFreshCalendars = false) => {
+        if (forceFreshCalendars) {
+          set({ calendars: freshCalendars, isInitialized: true });
+          return;
+        }
+
         const refreshedCalendars = {
           prod2: freshCalendars.prod2,
           top14: freshCalendars.top14,
