@@ -19,7 +19,7 @@ export default function FinalsButton() {
           </h3>
           <p className="mt-1 text-sm text-zinc-500">Playoffs → Semis → Final</p>
         </div>
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white transition group-hover:translate-x-1">
+        <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-selected text-white transition group-hover:translate-x-1">
           →
         </span>
       </div>

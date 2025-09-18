@@ -5,6 +5,11 @@
   --foreground: #171717;
 }
 
+@theme {
+  --color-selected: #2563eb;
+}
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

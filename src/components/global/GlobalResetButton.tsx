@@ -35,7 +35,7 @@ export default function GlobalResetButton() {
       onClick={handleReset}
       disabled={busy}
       className="inline-flex items-center gap-2 px-4 py-2 
-        bg-red-300 hover:bg-red-600 
+      bg-red-300 hover:bg-red-600 
         border border-gray-300 
         text-gray-700 
         rounded-lg transition-all duration-200 

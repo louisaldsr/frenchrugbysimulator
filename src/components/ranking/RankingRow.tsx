@@ -22,7 +22,9 @@ export default function RankingRow(props: RankingRowProps) {
       ? "text-red-600"
       : "";
 
-  const rowClass = "text-sm border-gray-100 " + (props.backgroundColor ?? "");
+  const rowClass =
+    "text-sm border-gray-100 " +
+    (props.backgroundColor ? `bg-${props.backgroundColor}` : "bg#aaaaaa");
 
   return (
     <tr className={rowClass}>

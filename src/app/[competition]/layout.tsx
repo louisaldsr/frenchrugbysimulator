@@ -2,6 +2,7 @@ import FinalsRefreshEffect from "@/actions/finals-refresher";
 import { loadGameStore } from "@/actions/game-competition-store-loader";
 import BackCompetitionButton from "@/components/competitions/BackCompetitionButton";
 import CompetitionStoreLoader from "@/components/competitions/CompetitionStoreLoader";
+import GlobalResetButton from "@/components/global/GlobalResetButton";
 import Title from "@/components/Title";
 import { notFound } from "next/navigation";
 
@@ -26,6 +27,7 @@ export default async function CompetitionLayout({
         <header className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
           <BackCompetitionButton />
           <Title />
+          <GlobalResetButton />
         </header>
         <main>
           <CompetitionStoreLoader

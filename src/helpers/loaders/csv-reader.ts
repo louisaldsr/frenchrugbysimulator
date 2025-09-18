@@ -23,7 +23,6 @@ export default async function readCsv(
         url: response.url,
       });
 
-      const text = await response.text();
       throw new Error(
         `Failed to load ${fileName} for ${competition}. Status: ${response.status}`
       );
