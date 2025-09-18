@@ -1,4 +1,10 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 
 const INVALID_SCORES = ["1", "2", "4"];
 
@@ -11,6 +17,10 @@ interface ScoreDisplayProps {
 export default function ScoreDisplay(props: ScoreDisplayProps) {
   const { score, setScore, changeScoreAction } = props;
   const [draftScore, setDraftScore] = useState<string>(score.toString());
+
+  useEffect(() => {
+    if (draftScore !== score.toString()) setDraftScore(score.toString());
+  }, [score]);
 
   const isInputValid = (input: string): number | null => {
     const trimmedInput = input.trim();

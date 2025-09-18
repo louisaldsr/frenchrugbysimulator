@@ -10,7 +10,7 @@ export interface DayTabsProps {
 
 export function DayTab(props: DayTabsProps) {
   function getTabBackgroundColor(): string {
-    if (props.isSelected) return "bg-blue-600 text-white";
+    if (props.isSelected) return "bg-selected text-white";
     const daySimulated = isDaySimulated(props.day);
     return daySimulated
       ? "bg-green-100 hover:bg-green-200"
