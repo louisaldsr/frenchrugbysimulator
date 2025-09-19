@@ -5,7 +5,6 @@ import {
   RANKING_RELEGATION_POSITIONS,
 } from "@/constants";
 import { useGameStore } from "@/context/GameStore";
-import { backgroundColors } from "@/styles/colors";
 import RankingHeader from "./RankingHeader";
 import RankingRow from "./RankingRow";
 
@@ -16,24 +15,24 @@ export default function RankingTable() {
 
   const getBackgroundColor = (position: number): string | undefined => {
     if (RANKING_QUALIFICATION_POSITIONS.SEMI_FINALS.includes(position)) {
-      return backgroundColors.ranking.semiQualified;
+      return "bg-green-200";
     }
     if (RANKING_QUALIFICATION_POSITIONS.PLAY_OFFS.includes(position)) {
-      return backgroundColors.ranking.playOffsQualified;
+      return "bg-green-100";
     }
     if (
       RANKING_RELEGATION_POSITIONS.RELEGATION.includes(
         numberOfTeams - position + 1
       )
     ) {
-      return backgroundColors.ranking.relagated;
+      return "bg-red-200";
     }
     if (
       RANKING_RELEGATION_POSITIONS.PLAY_OFFS.includes(
         numberOfTeams - position + 1
       )
     ) {
-      return backgroundColors.ranking.playOffsRelegated;
+      return "bg-red-100";
     }
   };
 
