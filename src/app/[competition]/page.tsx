@@ -1,8 +1,7 @@
 import Simulator from "@/components/Simulator";
 import { notFound } from "next/navigation";
-import { PageProps } from "../../../.next/types/app/page";
 
-export default async function Home(props: PageProps) {
+export default async function Home(props: PageProps<"/[competition]">) {
   const params = await props.params;
   const competition = params.competition;
   if (competition !== "top14" && competition !== "prod2") {
