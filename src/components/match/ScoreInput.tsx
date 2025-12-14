@@ -19,7 +19,7 @@ export default function ScoreDisplay(props: ScoreDisplayProps) {
   const [draftScore, setDraftScore] = useState<string>(score.toString());
 
   useEffect(() => {
-    if (draftScore !== score.toString()) setDraftScore(score.toString());
+    setDraftScore(score.toString());
   }, [score]);
 
   const isInputValid = (input: string): number | null => {
