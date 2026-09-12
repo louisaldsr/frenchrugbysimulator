@@ -1,16 +1,17 @@
-import { POINT_ATTRIBUTION_RULES } from "@/constants";
-import { Calendar } from "@/types/Calendar";
-import { MatchResult } from "@/types/Match";
-import { Team } from "@/types/Team";
-import { TeamRanking } from "@/types/TeamRanking";
-import { getMatchResult } from "./match-computer";
-import { sortRanking } from "./ranking-sorter";
+import { POINT_ATTRIBUTION_RULES } from '@/constants';
+import { Calendar } from '@/types/Calendar';
+import { MatchResult } from '@/types/Match';
+import { Team } from '@/types/Team';
+import { TeamRanking } from '@/types/TeamRanking';
+import { getMatchResult } from './match-computer';
+import { sortRanking } from './ranking-sorter';
 
 export function computeRanking(
   calendar: Calendar,
-  teams: Team[]
+  teams: Team[],
 ): TeamRanking[] {
   const table = new Map<string, TeamRanking>();
+  console.log(JSON.stringify(teams));
 
   const ensureTeamRanked = (teamId: string): TeamRanking => {
     if (!table.has(teamId)) {
@@ -37,14 +38,14 @@ export function computeRanking(
 
         /* POINTS & WIN/LOSS/DRAW UPDATE */
         const matchResult = getMatchResult(match);
-        if (matchResult.winner === "draw") {
+        if (matchResult.winner === 'draw') {
           home.points += POINT_ATTRIBUTION_RULES.DRAW;
           away.points += POINT_ATTRIBUTION_RULES.DRAW;
           home.totalMatchs.draws++;
           away.totalMatchs.draws++;
         } else {
-          const winnerRanking = matchResult.winner === "home" ? home : away;
-          const loserRanking = matchResult.winner === "home" ? away : home;
+          const winnerRanking = matchResult.winner === 'home' ? home : away;
+          const loserRanking = matchResult.winner === 'home' ? away : home;
           updateTeamRank(handleWinnerPoints(winnerRanking, matchResult));
           updateTeamRank(handleLoserPoints(loserRanking, matchResult));
         }
@@ -60,7 +61,7 @@ export function computeRanking(
 
 function createEmptyRanking(
   teamId: string,
-  teamInitialPoints: number
+  teamInitialPoints: number,
 ): TeamRanking {
   return {
     teamId,
@@ -80,7 +81,7 @@ function createEmptyRanking(
 
 function handleWinnerPoints(
   currentRanking: TeamRanking,
-  matchResult: MatchResult
+  matchResult: MatchResult,
 ): TeamRanking {
   return {
     ...currentRanking,
@@ -98,7 +99,7 @@ function handleWinnerPoints(
 
 function handleLoserPoints(
   currentRanking: TeamRanking,
-  matchResult: MatchResult
+  matchResult: MatchResult,
 ): TeamRanking {
   return {
     ...currentRanking,

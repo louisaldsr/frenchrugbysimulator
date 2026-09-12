@@ -1,6 +1,6 @@
 {
   "name": "frenchrugbysimulator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -17,7 +17,7 @@
     "i": "^0.3.7",
     "lucide-react": "^0.561.x",
     "next": "^16.0.x",
-    "npm": "^11.7.x",
+    "npm": "^11.19.0",
     "react": "19.2.x",
     "react-dom": "19.2.x",
     "uuid": "^13.x.x",
