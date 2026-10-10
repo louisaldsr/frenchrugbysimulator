@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "sync-results": "node scripts/sync-results.mjs",
+    "test:sync": "node --test scripts/sync-results.test.mjs"
   },
   "engines": {
     "node": ">=22.0.0"
