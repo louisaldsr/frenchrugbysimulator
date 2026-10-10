@@ -1,0 +1,43 @@
+name: Sync results
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # every day, 07:00 Paris (summer time)
+    - cron: "30 22 * * 0" # Sunday night, after the late TOP14 game
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-results
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Test parser
+        run: node --test scripts/sync-results.test.mjs
+
+      - name: Fetch results from lnr.fr
+        run: node scripts/sync-results.mjs
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "louisaldsr"
+          git config user.email "165600277+louisaldsr@users.noreply.github.com"
+          git add public/data/*/calendar.csv
+          if git diff --cached --quiet; then
+            echo "No new results"
+            exit 0
+          fi
+          git commit -m "chore(calendar): sync results from lnr.fr"
+          git pull --rebase
+          git push
